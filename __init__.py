@@ -9,22 +9,24 @@ import configparser
 from albert import *
 from pathlib import Path
 
-md_iid = '2.0'
-md_version = '1.0'
-md_name = 'Firefox Profile Launcher'
-md_description = 'Launch Firefox with one of the available profiles.'
-md_license = 'MIT'
-md_url = 'https://github.com/kringkaste/albert-firefox-profiles'
+md_iid = "2.0"
+md_version = "1.0"
+md_name = "Firefox Profile Launcher"
+md_description = "Launch Firefox with one of the available profiles."
+md_license = "MIT"
+md_url = "https://github.com/kringkaste/albert-firefox-profiles"
 
 
 class Plugin(PluginInstance, GlobalQueryHandler):
 
     def __init__(self):
-        GlobalQueryHandler.__init__(self,
-                                    id=md_id,
-                                    name=md_name,
-                                    description=md_description,
-                                    defaultTrigger='ff ')
+        GlobalQueryHandler.__init__(
+            self,
+            id=md_id,
+            name=md_name,
+            description=md_description,
+            defaultTrigger="ff ",
+        )
         PluginInstance.__init__(self, extensions=[self])
 
     def handleGlobalQuery(self, query):
@@ -47,13 +49,15 @@ class Plugin(PluginInstance, GlobalQueryHandler):
                                     Action(
                                         "Open",
                                         "Open %s" % config[section]["Name"],
-                                        lambda profile=config[section]["Name"]: runDetachedProcess(
+                                        lambda profile=config[section][
+                                            "Name"
+                                        ]: runDetachedProcess(
                                             ["firefox", "-P", profile]
                                         ),
                                     )
                                 ],
                             ),
-                            1
+                            1,
                         )
                     )
         else:
@@ -63,9 +67,8 @@ class Plugin(PluginInstance, GlobalQueryHandler):
                         id=md_id,
                         text="Not found",
                     ),
-                    1
+                    1,
                 )
             )
-
 
         return rank_items
