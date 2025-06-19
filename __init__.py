@@ -9,25 +9,26 @@ import configparser
 from albert import *
 from pathlib import Path
 
-md_iid = "2.0"
+md_iid = "3.0"
 md_version = "1.0"
 md_name = "Firefox Profile Launcher"
 md_description = "Launch Firefox with one of the available profiles."
 md_license = "MIT"
 md_url = "https://github.com/kringkaste/albert-firefox-profiles"
+md_authors = "@kringkaste"
 
 
 class Plugin(PluginInstance, GlobalQueryHandler):
 
     def __init__(self):
-        GlobalQueryHandler.__init__(
-            self,
-            id=md_id,
-            name=md_name,
-            description=md_description,
-            defaultTrigger="ff ",
-        )
-        PluginInstance.__init__(self, extensions=[self])
+        GlobalQueryHandler.__init__(self)
+        PluginInstance.__init__(self)
+
+    def defaultTrigger(self):
+        return 'ff '
+
+    def configWidget(self):
+        return [{ 'type': 'label', 'text': __doc__.strip() }]
 
     def handleGlobalQuery(self, query):
         home = Path.home()
