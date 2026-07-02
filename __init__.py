@@ -9,31 +9,36 @@ import configparser
 from albert import *
 from pathlib import Path
 
-md_iid = "3.0"
-md_version = "1.0"
+md_iid = "5.0"
+md_version = "1.0.0"
 md_name = "Firefox Profile Launcher"
 md_description = "Launch Firefox with one of the available profiles."
 md_license = "MIT"
 md_url = "https://github.com/kringkaste/albert-firefox-profiles"
-md_authors = "@kringkaste"
+md_authors = ["@kringkaste"]
+md_maintainers = ["@kringkaste"]
 
 
 class Plugin(PluginInstance, GlobalQueryHandler):
 
     def __init__(self):
-        GlobalQueryHandler.__init__(self)
         PluginInstance.__init__(self)
-
-    def defaultTrigger(self):
-        return 'ff '
+        GlobalQueryHandler.__init__(self)
 
     def configWidget(self):
         return [{ 'type': 'label', 'text': __doc__.strip() }]
 
-    def handleGlobalQuery(self, query):
+    def defaultTrigger(self):
+        return 'ff '
+
+    @staticmethod
+    def makeIcon():
+        return Icon.image(Path(__file__).parent / "firefox.png")
+
+    def rankItems(self, query):
         home = Path.home()
-        plugin_dir = Path(__file__).parent
         rank_items = []
+
         if os.path.isfile(home / ".mozilla" / "firefox" / "profiles.ini"):
             config = configparser.ConfigParser()
             config.read(home / ".mozilla" / "firefox" / "profiles.ini")
@@ -44,8 +49,7 @@ class Plugin(PluginInstance, GlobalQueryHandler):
                             StandardItem(
                                 id=section,
                                 text=config[section]["Name"],
-                                inputActionText=query.trigger + config[section]["Name"],
-                                iconUrls=["file:" + str(plugin_dir / "firefox.png")],
+                                icon_factory=self.makeIcon,
                                 actions=[
                                     Action(
                                         "Open",
@@ -65,8 +69,8 @@ class Plugin(PluginInstance, GlobalQueryHandler):
             rank_items.append(
                 RankItem(
                     StandardItem(
-                        id=md_id,
-                        text="Not found",
+                        id="no_profiles",
+                        text="No profiles found",
                     ),
                     1,
                 )
