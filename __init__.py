@@ -38,33 +38,35 @@ class Plugin(PluginInstance, GlobalQueryHandler):
     def rankItems(self, query):
         home = Path.home()
         rank_items = []
+        matcher = Matcher(query.query)
 
         if os.path.isfile(home / ".mozilla" / "firefox" / "profiles.ini"):
             config = configparser.ConfigParser()
             config.read(home / ".mozilla" / "firefox" / "profiles.ini")
             for section in config.sections():
                 if section.startswith("Profile"):
-                    rank_items.append(
-                        RankItem(
-                            StandardItem(
-                                id=section,
-                                text=config[section]["Name"],
-                                icon_factory=self.makeIcon,
-                                actions=[
-                                    Action(
-                                        "Open",
-                                        "Open %s" % config[section]["Name"],
-                                        lambda profile=config[section][
-                                            "Name"
-                                        ]: runDetachedProcess(
-                                            ["firefox", "-P", profile]
-                                        ),
-                                    )
-                                ],
-                            ),
-                            1,
+                    if m := matcher.match(config[section]["Name"]):
+                        rank_items.append(
+                            RankItem(
+                                StandardItem(
+                                    id=section,
+                                    text=config[section]["Name"],
+                                    icon_factory=self.makeIcon,
+                                    actions=[
+                                        Action(
+                                            "Open",
+                                            "Open %s" % config[section]["Name"],
+                                            lambda profile=config[section][
+                                                "Name"
+                                            ]: runDetachedProcess(
+                                                ["firefox", "-P", profile]
+                                            ),
+                                        )
+                                    ],
+                                ),
+                                1,
+                            )
                         )
-                    )
         else:
             rank_items.append(
                 RankItem(
