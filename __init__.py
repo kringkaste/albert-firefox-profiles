@@ -78,4 +78,6 @@ class Plugin(PluginInstance, GlobalQueryHandler):
                 )
             )
 
-        return rank_items
+        if query.isValid and query.string.startswith('ff'):
+            return rank_items
+        return []
